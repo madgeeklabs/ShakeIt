@@ -34,7 +34,7 @@ public class MyActivity extends Activity implements SensorEventListener {
     private Sensor mSensor;
     private float xLast;
     private long lastTimeStamp;
-    private static final float DIFF = (float) 1.5;
+    private static final float DIFF = (float) 8.5;
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
 
@@ -155,7 +155,7 @@ public class MyActivity extends Activity implements SensorEventListener {
         timeStampSec = System.currentTimeMillis();
         if (x - xLast > DIFF && (timeStampSec - lastTimeStamp) > 800) {
             Log.d(TAG, "" + (x - xLast));
-            Toast.makeText(this, "Tapped! :)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "" + (x - xLast), Toast.LENGTH_SHORT).show();
             sendToast();
             lastTimeStamp = timeStampSec;
         }
@@ -177,7 +177,6 @@ public class MyActivity extends Activity implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
-
 
    private void sendReadings(final byte[] readings) {
        final GoogleApiClient client = getGoogleApiClient(this);
