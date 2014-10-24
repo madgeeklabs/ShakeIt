@@ -78,7 +78,7 @@ public class MyActivity extends Activity implements SensorEventListener {
                 @Override
                 public void run() {
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    User me = new User("goofyahead", "payment", 16.50);
+                    User me = new User("goofyahead", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
                     Gson myGson = new Gson();
                     String message = myGson.toJson(me, User.class);
                     Wearable.MessageApi.sendMessage(client, nodeId, message, null);
@@ -101,9 +101,7 @@ public class MyActivity extends Activity implements SensorEventListener {
                     nodeId = nodes.get(0).getId();
                 }
                 client.disconnect();
-
                 Log.d(TAG, "I found a: " + nodeId);
-                sendToast();
             }
         }).start();
     }
@@ -142,7 +140,7 @@ public class MyActivity extends Activity implements SensorEventListener {
             FloatBuffer floatBuf = byteBuf.asFloatBuffer();
             floatBuf.put(readings);
             byte [] byte_array = byteBuf.array();
-            sendReadings(byte_array);
+//            sendReadings(byte_array);
             count = 0  ;
         }
 
@@ -158,6 +156,7 @@ public class MyActivity extends Activity implements SensorEventListener {
         if (x - xLast > DIFF && (timeStampSec - lastTimeStamp) > 800) {
             Log.d(TAG, "" + (x - xLast));
             Toast.makeText(this, "Tapped! :)", Toast.LENGTH_SHORT).show();
+            sendToast();
             lastTimeStamp = timeStampSec;
         }
 
@@ -193,9 +192,7 @@ public class MyActivity extends Activity implements SensorEventListener {
                    nodeId = nodes.get(0).getId();
                }
                client.disconnect();
-
                Log.d(TAG, "I found a: " + nodeId);
-               sendToast();
            }
        }).start();
        if (nodeId != null) {

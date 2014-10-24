@@ -7,11 +7,13 @@ public class User {
     private String username;
     private String operation;
     private double ammount;
+    private String timeStamp;
 
-    public User(String username, String operation, double ammount) {
+    public User(String username, String operation, double ammount, String timeStamp) {
         this.username = username;
         this.operation = operation;
         this.ammount = ammount;
+        this.timeStamp = timeStamp;
     }
 
     public String getUsername() {
@@ -36,5 +38,13 @@ public class User {
 
     public void setAmmount(double ammount) {
         this.ammount = ammount;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

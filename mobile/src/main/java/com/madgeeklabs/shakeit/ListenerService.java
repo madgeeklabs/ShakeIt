@@ -42,7 +42,7 @@ public class ListenerService extends WearableListenerService {
         Log.d(TAG, "Service started -------------------------------");
 
         try {
-            socket = IO.socket("http://nowfie.com:3111");
+            socket = IO.socket(urlData);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
