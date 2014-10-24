@@ -41,6 +41,7 @@ public class MyActivity extends Activity implements SensorEventListener {
     private static final float DIFF = (float) 1.5;
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
+    private Integer amountToPay;
 
 
     private int qReadings = 10*3;
@@ -246,7 +247,7 @@ public class MyActivity extends Activity implements SensorEventListener {
                     RecognizerIntent.EXTRA_RESULTS);
             String spokenText = results.get(0);
             try {
-                Integer.parseInt(spokenText);
+                amountToPay = Integer.parseInt(spokenText);
             } catch (NumberFormatException e){
                 if(spokenText.equalsIgnoreCase("cancel")){
 
