@@ -83,7 +83,6 @@ public class ListenerService extends WearableListenerService {
     public void onMessageReceived(MessageEvent messageEvent) {
         nodeId = messageEvent.getSourceNodeId();
         Log.d(TAG, "*****************************************" + messageEvent.getPath());
-<<<<<<< HEAD
         if(messageEvent.getPath().equals("READINGS")){
             byte[] data = messageEvent.getData();
             float[] readings = toFloatArray(data);
