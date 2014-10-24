@@ -1,6 +1,8 @@
 package com.madgeeklabs.shakeit;
 
+import android.content.Intent;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
@@ -10,6 +12,7 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.madgeeklabs.shakeit.api.Api;
@@ -34,9 +37,9 @@ public class ListenerService extends WearableListenerService {
     private Socket socket;
     private String urlData = "http://nowfie.com:7000";
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    public ListenerService() {
+        super();
+        Log.d(TAG, "Service started -------------------------------");
 
         try {
             socket = IO.socket("http://nowfie.com:3111");
@@ -80,6 +83,7 @@ public class ListenerService extends WearableListenerService {
     public void onMessageReceived(MessageEvent messageEvent) {
         nodeId = messageEvent.getSourceNodeId();
         Log.d(TAG, "*****************************************" + messageEvent.getPath());
+<<<<<<< HEAD
         if(messageEvent.getPath().equals("READINGS")){
             byte[] data = messageEvent.getData();
             float[] readings = toFloatArray(data);
@@ -101,6 +105,7 @@ public class ListenerService extends WearableListenerService {
             showToast(messageEvent.getPath());
         }else{
             showToast(messageEvent.getPath());
+        socket.emit("message", messageEvent.getPath());
         }
     }
 
