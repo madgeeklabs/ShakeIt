@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,11 +56,19 @@ public class MyActivity extends Activity implements SensorEventListener {
         mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        displaySpeechRecognizer();
+
+
+
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
                 mTextView = (TextView) stub.findViewById(R.id.text);
+                final Button button = (Button) findViewById(R.id.pay);
+                button.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        displaySpeechRecognizer();
+                    }
+                });
 
                 getGoogleApiClient(MyActivity.this);
                 retrieveDeviceNode();
@@ -235,6 +245,17 @@ public class MyActivity extends Activity implements SensorEventListener {
             List<String> results = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
             String spokenText = results.get(0);
+            try {
+                Integer.parseInt(spokenText);
+            } catch (NumberFormatException e){
+                if(spokenText.equalsIgnoreCase("cancel")){
+
+                }else{
+                    displaySpeechRecognizer();
+                }
+
+            }
+
             Log.d("spoken", spokenText);
             // Do something with spokenText
         }
