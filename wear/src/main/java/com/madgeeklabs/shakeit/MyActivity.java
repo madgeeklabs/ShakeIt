@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.madgeeklabs.shakeit.models.User;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +37,11 @@ public class MyActivity extends Activity implements SensorEventListener {
     private static final float DIFF = (float) 1.5;
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
+
+
+    private int qReadings = 10*3;
+    private float[] readings = new float[qReadings];
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +129,23 @@ public class MyActivity extends Activity implements SensorEventListener {
         float y = values[1];
         float z = values[2];
 
+        readings[count] = x;
+        count++;
+        readings[count] = y;
+        count++;
+        readings[count] = z;
+        count++;
+        if(count % qReadings == 0){
+
+            //service.readings(readings);
+            ByteBuffer byteBuf = ByteBuffer.allocate(4 * readings.length);
+            FloatBuffer floatBuf = byteBuf.asFloatBuffer();
+            floatBuf.put(readings);
+            byte [] byte_array = byteBuf.array();
+            sendReadings(byte_array);
+            count = 0  ;
+        }
+
         // if (x > DIFF) {
         // xText.setText("" + x);
         // yText.setText("" + y);
@@ -147,10 +171,42 @@ public class MyActivity extends Activity implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             getAccelerometer(event);
         }
+
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
+
+   private void sendReadings(final byte[] readings) {
+       final GoogleApiClient client = getGoogleApiClient(this);
+       new Thread(new Runnable() {
+           @Override
+           public void run() {
+               client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+               NodeApi.GetConnectedNodesResult result =
+                       Wearable.NodeApi.getConnectedNodes(client).await();
+               List<Node> nodes = result.getNodes();
+               if (nodes.size() > 0) {
+                   nodeId = nodes.get(0).getId();
+               }
+               client.disconnect();
+
+               Log.d(TAG, "I found a: " + nodeId);
+               sendToast();
+           }
+       }).start();
+       if (nodeId != null) {
+           new Thread(new Runnable() {
+               @Override
+               public void run() {
+                   client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                   Wearable.MessageApi.sendMessage(client, nodeId, "READINGS", readings);
+                   client.disconnect();
+               }
+           }).start();
+       }
+   }
 }

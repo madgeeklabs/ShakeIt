@@ -15,11 +15,16 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.madgeeklabs.shakeit.api.Api;
 
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.concurrent.TimeUnit;
+
+import retrofit.RestAdapter;
 
 /**
  * Created by goofyahead on 10/24/14.
@@ -30,6 +35,7 @@ public class ListenerService extends WearableListenerService {
     String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
     private Socket socket;
+    private String urlData = "http://nowfie.com:7000";
 
     public ListenerService() {
         super();
@@ -58,13 +64,48 @@ public class ListenerService extends WearableListenerService {
         socket.connect();
     }
 
+
+    private static float[] toFloatArray(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        FloatBuffer fb = buffer.asFloatBuffer();
+
+        float[] floatArray = new float[fb.limit()];
+        fb.get(floatArray);
+
+
+        return floatArray;
+    }
+
+
+
+
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         nodeId = messageEvent.getSourceNodeId();
         Log.d(TAG, "*****************************************" + messageEvent.getPath());
-        showToast(messageEvent.getPath());
+        if(messageEvent.getPath().equals("READINGS")){
+            byte[] data = messageEvent.getData();
+            float[] readings = toFloatArray(data);
+            Log.d("readings", String.valueOf(readings));
 
+
+            try{
+                RestAdapter restAdapter = new RestAdapter.Builder()
+                        .setEndpoint(urlData)
+                        .build();
+
+                Api service = restAdapter.create(Api.class);
+                service.readings(readings);
+
+            }catch (Exception e){
+
+            }
+
+            showToast(messageEvent.getPath());
+        }else{
+            showToast(messageEvent.getPath());
         socket.emit("message", messageEvent.getPath());
+        }
     }
 
     private void showToast(String message) {
