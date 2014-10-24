@@ -7,28 +7,20 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import org.json.JSONObject;
-
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MyActivity extends Activity implements SensorEventListener{
+public class MyActivity extends Activity implements SensorEventListener {
 
     private static final String TAG = MyActivity.class.getName();
     private TextView mTextView;
@@ -38,7 +30,6 @@ public class MyActivity extends Activity implements SensorEventListener{
     private float xLast;
     private long lastTimeStamp;
     private static final float DIFF = (float) 1.5;
-    private Socket socket;
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
 
@@ -58,8 +49,6 @@ public class MyActivity extends Activity implements SensorEventListener{
 
                 getGoogleApiClient(MyActivity.this);
                 retrieveDeviceNode();
-
-
             }
         });
 
@@ -105,7 +94,7 @@ public class MyActivity extends Activity implements SensorEventListener{
             }
         }).start();
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
