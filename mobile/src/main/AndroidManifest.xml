@@ -22,7 +22,8 @@
         </activity>
 
         <service
-            android:name=".ListenerService" >
+            android:name=".ListenerService"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>

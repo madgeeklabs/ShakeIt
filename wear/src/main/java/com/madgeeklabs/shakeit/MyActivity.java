@@ -16,6 +16,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.madgeeklabs.shakeit.models.User;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +71,10 @@ public class MyActivity extends Activity implements SensorEventListener {
                 @Override
                 public void run() {
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    Wearable.MessageApi.sendMessage(client, nodeId, "HOLA", null);
+                    User me = new User("goofyahead", "payment", 16.50);
+                    Gson myGson = new Gson();
+                    String message = myGson.toJson(me, User.class);
+                    Wearable.MessageApi.sendMessage(client, nodeId, message, null);
                     client.disconnect();
                 }
             }).start();

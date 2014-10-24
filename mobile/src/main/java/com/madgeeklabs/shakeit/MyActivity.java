@@ -10,11 +10,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +28,7 @@ public class MyActivity extends Activity implements SensorEventListener{
     private static final String TAG = MyActivity.class.getName();
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
+    private Socket socket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +38,6 @@ public class MyActivity extends Activity implements SensorEventListener{
         Log.d(TAG, "STARTING AND MESSAGING TO THE WEAR");
         getGoogleApiClient(this);
         retrieveDeviceNode();
-
 
     }
 
