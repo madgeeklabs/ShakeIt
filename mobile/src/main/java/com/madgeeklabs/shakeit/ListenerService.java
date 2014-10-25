@@ -76,9 +76,6 @@ public class ListenerService extends WearableListenerService {
         return floatArray;
     }
 
-
-
-
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         nodeId = messageEvent.getSourceNodeId();
@@ -109,7 +106,7 @@ public class ListenerService extends WearableListenerService {
     }
 
     private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void reply(String message) {
