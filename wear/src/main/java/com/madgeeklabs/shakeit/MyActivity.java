@@ -147,7 +147,7 @@ public class MyActivity extends Activity implements SensorEventListener {
         count++;
         readings[count] = z;
         count++;
-        if(count % qReadings == 0){
+        if(false && count % qReadings == 0){
 
             //service.readings(readings);
             ByteBuffer byteBuf = ByteBuffer.allocate(4 * readings.length);
