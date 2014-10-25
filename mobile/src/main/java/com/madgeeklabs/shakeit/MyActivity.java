@@ -54,7 +54,7 @@ public class MyActivity extends Activity implements SensorEventListener{
         int compressRatio = 90;
         bi.compress(Bitmap.CompressFormat.JPEG, compressRatio, baos);
         byte[] data = baos.toByteArray();
-        while(data.length/1024>maxKiloBytes){
+        while((data.length/1024) > maxKiloBytes){
             compressRatio = compressRatio - 10;
             if(compressRatio<1){
                 return new byte[0];
@@ -77,9 +77,6 @@ public class MyActivity extends Activity implements SensorEventListener{
 
 
         // Read a Bitmap from Assets
-            Drawable drawable = getResources().getDrawable(R.drawable.s);
-            Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.s);
-            byte[] toSend = compress(bitmap, 5);
             // Assign the bitmap to an ImageView in this layout
 
     }
@@ -126,7 +123,9 @@ public class MyActivity extends Activity implements SensorEventListener{
                 client.disconnect();
 
                 Log.d(TAG, "I found a: " + nodeId);
-                sendToast();
+                Bitmap bitmap = BitmapFactory.decodeResource(MyActivity.this.getResources(), R.drawable.s);
+                byte[] toSend = compress(bitmap, 50);
+                sendImage(toSend);
             }
         }).start();
     }
@@ -163,21 +162,9 @@ public class MyActivity extends Activity implements SensorEventListener{
 
    private void sendImage(final byte[] imageBytes) {
        final GoogleApiClient client = getGoogleApiClient(this);
-       new Thread(new Runnable() {
-           @Override
-           public void run() {
-               client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-               NodeApi.GetConnectedNodesResult result =
-                       Wearable.NodeApi.getConnectedNodes(client).await();
-               List<Node> nodes = result.getNodes();
-               if (nodes.size() > 0) {
-                   nodeId = nodes.get(0).getId();
-               }
-               client.disconnect();
-               Log.d(TAG, "I found a: " + nodeId);
-           }
-       }).start();
        if (nodeId != null) {
+           Log.d(TAG, "sending");
+           Log.d(TAG, "bytes" + String.valueOf(imageBytes.length));
            new Thread(new Runnable() {
                @Override
                public void run() {
@@ -186,7 +173,11 @@ public class MyActivity extends Activity implements SensorEventListener{
                    client.disconnect();
                }
            }).start();
+       }else{
+           Log.d(TAG, "not sending");
+
        }
+
    }
 
 }

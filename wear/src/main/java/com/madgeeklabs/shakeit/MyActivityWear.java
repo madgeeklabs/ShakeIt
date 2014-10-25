@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,6 +17,7 @@ import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +42,7 @@ public class MyActivityWear extends Activity implements SensorEventListener {
 
     private static final String TAG = MyActivityWear.class.getName();
     private TextView mTextView;
+    private ImageView mView;
     private long timeStampSec;
     private SensorManager sensorManager;
     private Sensor mSensor;
@@ -68,7 +72,7 @@ public class MyActivityWear extends Activity implements SensorEventListener {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
-                mTextView = (TextView) stub.findViewById(R.id.text);
+                mView = (ImageView) stub.findViewById(R.id.imageView1);
                 final Button button = (Button) findViewById(R.id.pay);
                 button.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -90,6 +94,7 @@ public class MyActivityWear extends Activity implements SensorEventListener {
         myReceiver = new MyReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ListenerServiceWear.MY_ACTION);
+        intentFilter.addAction(ListenerServiceWear.IMAGE);
         registerReceiver(myReceiver, intentFilter);
 
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
@@ -100,8 +105,20 @@ public class MyActivityWear extends Activity implements SensorEventListener {
 
         @Override
         public void onReceive(Context arg0, Intent arg1) {
-            double datapassed = arg1.getDoubleExtra("AMOUNT", 0);
-            Log.d(TAG, "captured through broadcast, money: " + datapassed);
+            Log.d(TAG,"recieved broadcast");
+            Log.d(TAG,"recieved " +arg1.getAction());
+            if(arg1.getAction().equalsIgnoreCase(ListenerServiceWear.IMAGE)){
+                Log.d(TAG,"recieved IMAGE");
+                byte[] data = arg1.getByteArrayExtra("DATA");
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                mView.setImageBitmap(bitmap);
+
+
+            }else if(arg1.getAction().equalsIgnoreCase(ListenerServiceWear.MY_ACTION)){
+                double datapassed = arg1.getDoubleExtra("AMOUNT", 0);
+                Log.d(TAG, "captured through broadcast, money: " + datapassed);
+
+            }
         }
 
     }
