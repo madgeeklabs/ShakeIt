@@ -125,7 +125,7 @@ public class MyActivityWear extends Activity implements SensorEventListener {
                 double amount = arg1.getDoubleExtra("AMOUNT", 0);
                 String name = arg1.getStringExtra("NAME");
                 Log.d(TAG, "captured through broadcast, money: " + amount + " from: " + name);
-                if (arg1.getStringExtra("TYPE").equalsIgnoreCase("receiving")) {
+                if (! arg1.getStringExtra("TYPE").equalsIgnoreCase("receiving")) {
                     transactionAmount.setText("+" + amount + "€");
                     transactionAmount.setTextColor(getResources().getColor(R.color.green));
                 } else {
