@@ -2,6 +2,7 @@ package com.madgeeklabs.shakeit;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +12,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,8 +47,16 @@ public class MyActivity extends Activity implements SensorEventListener{
     private static final String TAG = MyActivity.class.getName();
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
+    private Button takeSelfie;
 
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
 
 
     private byte[] compress(Bitmap bi, int maxKiloBytes){
@@ -75,7 +85,8 @@ public class MyActivity extends Activity implements SensorEventListener{
         getGoogleApiClient(this);
         retrieveDeviceNode();
 
-
+        takeSelfie = (Button) findViewById(R.id.take_picture);
+        
         // Read a Bitmap from Assets
             // Assign the bitmap to an ImageView in this layout
 
