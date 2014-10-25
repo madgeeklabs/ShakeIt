@@ -100,8 +100,9 @@ public class MyActivityWear extends Activity implements SensorEventListener {
 
         @Override
         public void onReceive(Context arg0, Intent arg1) {
-            double datapassed = arg1.getDoubleExtra("AMOUNT", 0);
-            Log.d(TAG, "captured through broadcast, money: " + datapassed);
+            double amount = arg1.getDoubleExtra("AMOUNT", 0);
+            String name = arg1.getStringExtra("NAME");
+            Log.d(TAG, "captured through broadcast, money: " + amount + " from: " + name);
         }
 
     }

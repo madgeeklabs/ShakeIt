@@ -8,6 +8,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.google.gson.Gson;
+import com.madgeeklabs.shakeit.models.User;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,9 +31,13 @@ public class ListenerServiceWear extends WearableListenerService {
     }
 
     private void showToast(String message) {
+
+        Gson gson = new Gson();
+        User one = gson.fromJson(message, User.class);
         Intent intent = new Intent();
         intent.setAction(MY_ACTION);
-        intent.putExtra("DATAPASSED", "something");
+        intent.putExtra("AMOUNT", one.getAmmount());
+        intent.putExtra("NAME", one.getUsername());
         sendBroadcast(intent);
     }
 
