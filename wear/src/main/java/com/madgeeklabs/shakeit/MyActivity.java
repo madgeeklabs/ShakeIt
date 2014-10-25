@@ -90,7 +90,7 @@ public class MyActivity extends Activity implements SensorEventListener {
                 @Override
                 public void run() {
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    User me = new User("goofyahead", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
+                    User me = new User("elchudi", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
                     Gson myGson = new Gson();
                     String message = myGson.toJson(me, User.class);
                     Wearable.MessageApi.sendMessage(client, nodeId, message, null);
@@ -145,7 +145,7 @@ public class MyActivity extends Activity implements SensorEventListener {
         count++;
         readings[count] = z;
         count++;
-        if(count % qReadings == 0){
+        if(false && count % qReadings == 0){
 
             //service.readings(readings);
             ByteBuffer byteBuf = ByteBuffer.allocate(4 * readings.length);
