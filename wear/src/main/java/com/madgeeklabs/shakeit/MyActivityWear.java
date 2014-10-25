@@ -167,6 +167,7 @@ public class MyActivityWear extends Activity implements SensorEventListener {
                         me = new User("goofyahead", "receiving", amountToPay, String.valueOf(System.currentTimeMillis()));
                     } else {
                         me = new User("goofyahead", "payment", amountToPay, String.valueOf(System.currentTimeMillis()));
+                        Log.d(TAG, "amount to pay:" + amountToPay);
                     }
                     Gson myGson = new Gson();
                     String message = myGson.toJson(me, User.class);
