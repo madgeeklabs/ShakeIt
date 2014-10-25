@@ -38,7 +38,7 @@ public class MyActivity extends Activity implements SensorEventListener {
     private Sensor mSensor;
     private float xLast;
     private long lastTimeStamp;
-    private static final float DIFF = (float) 8.5;
+    private static final float DIFF = (float) 4.5;
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
     private Integer amountToPay;
@@ -90,7 +90,7 @@ public class MyActivity extends Activity implements SensorEventListener {
                 @Override
                 public void run() {
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    User me = new User("elchudi", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
+                    User me = new User("goofyahead", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
                     Gson myGson = new Gson();
                     String message = myGson.toJson(me, User.class);
                     Wearable.MessageApi.sendMessage(client, nodeId, message, null);
