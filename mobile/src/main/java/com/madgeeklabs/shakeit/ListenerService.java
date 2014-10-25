@@ -61,6 +61,13 @@ public class ListenerService extends WearableListenerService {
             }
         });
 
+        socket.on("shaked", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d(TAG, "received SHAKEEEEEE -_____--____--___--__--_-_-_");
+            }
+        });
+
         socket.connect();
     }
 

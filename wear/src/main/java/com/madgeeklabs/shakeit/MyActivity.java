@@ -58,8 +58,6 @@ public class MyActivity extends Activity implements SensorEventListener {
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
 
-
-
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
