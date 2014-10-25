@@ -1,5 +1,6 @@
 package com.madgeeklabs.shakeit;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,9 +16,8 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.google.gson.Gson;
 import com.madgeeklabs.shakeit.api.Api;
-
-import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -67,6 +67,8 @@ public class ListenerService extends WearableListenerService {
             @Override
             public void call(Object... args) {
                 Log.d(TAG, "received SHAKEEEEEE -_____--____--___--__--_-_-_");
+                Gson gson = new Gson();
+                sendToast(args[0].toString());
             }
         });
 
@@ -83,6 +85,26 @@ public class ListenerService extends WearableListenerService {
 
 
         return floatArray;
+    }
+
+    private void sendToast(final String message) {
+        final GoogleApiClient client = getGoogleApiClient(this);
+        if (nodeId != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    Wearable.MessageApi.sendMessage(client, nodeId, message, null);
+                    client.disconnect();
+                }
+            }).start();
+        }
+    }
+
+    private GoogleApiClient getGoogleApiClient(Context context) {
+        return new GoogleApiClient.Builder(context)
+                .addApi(Wearable.API)
+                .build();
     }
 
     @Override
