@@ -146,13 +146,4 @@ public class ListenerService extends WearableListenerService {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void reply(String message) {
-        GoogleApiClient client = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .build();
-        client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-        Wearable.MessageApi.sendMessage(client, nodeId, message, null);
-        client.disconnect();
-    }
-
 }

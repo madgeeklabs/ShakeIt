@@ -18,20 +18,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.gson.Gson;
 import com.madgeeklabs.shakeit.models.User;
+
+import org.w3c.dom.Text;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -58,6 +56,12 @@ public class MyActivityWear extends Activity implements SensorEventListener {
     private float[] readings = new float[qReadings];
     private int count = 0;
     private MyReceiver myReceiver;
+    private Button paymentButton;
+    private ImageView confirmedTransaction;
+    private TextView amountToPayTextView;
+    private RelativeLayout resultHolder;
+    private TextView userName;
+    private TextView transactionAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +77,13 @@ public class MyActivityWear extends Activity implements SensorEventListener {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
                 mView = (ImageView) stub.findViewById(R.id.imageView1);
-                final Button button = (Button) findViewById(R.id.pay);
-                button.setOnClickListener(new View.OnClickListener() {
+                paymentButton = (Button) findViewById(R.id.pay);
+                amountToPayTextView = (TextView) findViewById(R.id.amount_to_pay);
+                confirmedTransaction = (ImageView) findViewById(R.id.confirmed_transaction);
+                resultHolder = (RelativeLayout) findViewById(R.id.result_holder);
+                userName = (TextView) findViewById(R.id.name_holder);
+                transactionAmount = (TextView) findViewById(R.id.transaction_holder_amount);
+                paymentButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         displaySpeechRecognizer();
                     }
@@ -115,9 +124,13 @@ public class MyActivityWear extends Activity implements SensorEventListener {
 
 
             }else if(arg1.getAction().equalsIgnoreCase(ListenerServiceWear.MY_ACTION)){
-                double datapassed = arg1.getDoubleExtra("AMOUNT", 0);
-                Log.d(TAG, "captured through broadcast, money: " + datapassed);
-
+                double amount = arg1.getDoubleExtra("AMOUNT", 0);
+                String name = arg1.getStringExtra("NAME");
+                Log.d(TAG, "captured through broadcast, money: " + amount + " from: " + name);
+                transactionAmount.setText("" + amount + "€");
+                userName.setText(name);
+                confirmedTransaction.setVisibility(View.VISIBLE);
+                resultHolder.setVisibility(View.VISIBLE);
             }
         }
 
@@ -282,13 +295,15 @@ public class MyActivityWear extends Activity implements SensorEventListener {
             String spokenText = results.get(0);
             try {
                 amountToPay = Integer.parseInt(spokenText);
+                paymentButton.setVisibility(View.GONE);
+                amountToPayTextView.setText("" + amountToPay + "€");
+                amountToPayTextView.setVisibility(View.VISIBLE);
             } catch (NumberFormatException e){
                 if(spokenText.equalsIgnoreCase("cancel")){
 
                 }else{
                     displaySpeechRecognizer();
                 }
-
             }
 
             Log.d("spoken", spokenText);

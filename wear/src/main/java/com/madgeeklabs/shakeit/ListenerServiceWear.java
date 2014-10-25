@@ -38,7 +38,6 @@ public class ListenerServiceWear extends WearableListenerService {
             intent.setAction(IMAGE);
             intent.putExtra("DATA", data);
             sendBroadcast(intent);
-
         }else{
             showToast(messageEvent.getPath());
         }

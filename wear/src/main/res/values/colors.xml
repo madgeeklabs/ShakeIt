@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#6CD1EA</color>
+    <color name="gray">#C6C6C6</color>
+    <color name="white">#FFFFFF</color>
+    <color name="error_red">#AAFF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="black">#000000</color>
+    <color name="info_blue">#ff3fc4d5</color>
+
+    <color name="nowfie_dark_purple">#4A2F57</color>
+    <color name="nowfie_purple">#67337F</color>
+    <color name="nowfie_light_purple">#B669D4</color>
+    <color name="nowfie_whitee">#FFFFFF</color>
+    <color name="nowfie_green">#70CC97</color>
+    <color name="nowfie_gray">#646464</color>
+    <color name="nowfie_light_gray">#8A8A8A</color>
+    <color name="nowfie_lighter_gray">#ACACAC</color>
+    <color name="nowfie_black">#313131</color>
+
+    <!-- circle pager indicator -->
+    <color name="circle_empty">#FFA3A3A3</color>
+
+</resources>

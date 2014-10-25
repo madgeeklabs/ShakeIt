@@ -1,21 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".MyActivity"
+    android:background="@color/nowfie_light_purple"
     tools:deviceIds="wear_square">
 
     <Button
+        android:background="@drawable/circle"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:text="Pay"
+        android:layout_centerInParent="true"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:id="@+id/pay" />
+    <TextView
+        android:id="@+id/amount_to_pay"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pay "
-        android:id="@+id/pay"
-        android:layout_gravity="center_horizontal" />
+        android:textColor="@color/white"
+        android:layout_centerInParent="true"
+        android:text="33,45 $"
+        android:textSize="39sp"/>
+    <ImageView
+        android:id="@+id/confirmed_transaction"
+        android:visibility="gone"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/selected_user_btn"/>
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         />
-</LinearLayout>
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/result_holder"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/black_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="90dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true">
+            <TextView
+                android:id="@+id/name_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:text="Gustavo"
+                android:textSize="25sp"
+                />
+            <TextView
+                android:id="@+id/transaction_holder_amount"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:text="+24 e"
+                android:textSize="25sp"
+                />
+            </LinearLayout>
+
+        </RelativeLayout>
+</RelativeLayout>
