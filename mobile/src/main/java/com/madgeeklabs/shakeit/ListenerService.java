@@ -2,6 +2,9 @@ package com.madgeeklabs.shakeit;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -20,6 +23,11 @@ import com.google.gson.Gson;
 import com.madgeeklabs.shakeit.api.Api;
 import com.madgeeklabs.shakeit.models.UserData;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -27,7 +35,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by goofyahead on 10/24/14.
@@ -37,6 +48,7 @@ public class ListenerService extends WearableListenerService {
     private static final String TAG = ListenerService.class.getName();
     String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
+    private String urlImages = "http://nowfie.com";
     private Socket socket;
     private String urlData = "http://nowfie.com:7000";
     private ShakeitSharedPrefs prefs;
@@ -73,6 +85,55 @@ public class ListenerService extends WearableListenerService {
                 Log.d(TAG, "received SHAKEEEEEE -_____--____--___--__--_-_-_");
                 Gson gson = new Gson();
                 UserData data = gson.fromJson(args[0].toString(), UserData.class);
+
+                RestAdapter restAdapter = new RestAdapter.Builder()
+                        .setEndpoint(urlImages)
+                        .build();
+
+                Api service = restAdapter.create(Api.class);
+
+                service.getImage(data.getImage(), new Callback<Response>() {
+                    @Override
+                    public void success(Response response, Response response2) {
+                        Log.d(TAG,"success");
+                        final Response r = response;
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground( final Void ... params ) {
+                                try {
+                                    InputStream is = null;
+
+                                    is = r.getBody().in();
+                                    byte[] bytes = IOUtils.toByteArray(is);
+
+                                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                    byte[] toSend = compress(bitmap, 50);
+                                    sendImage(toSend);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute( final Void result ) {
+                                // continue what you are doing...
+
+                            }
+                        }.execute();
+
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Log.d(TAG,"failure");
+                        Log.d(TAG,error.getMessage());
+
+                    }
+                });
+
                 sendToast(args[0].toString());
             }
         });
@@ -80,6 +141,45 @@ public class ListenerService extends WearableListenerService {
         socket.connect();
     }
 
+
+
+    private byte[] compress(Bitmap bi, int maxKiloBytes){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int compressRatio = 90;
+        bi.compress(Bitmap.CompressFormat.JPEG, compressRatio, baos);
+        byte[] data = baos.toByteArray();
+        while((data.length/1024) > maxKiloBytes){
+            compressRatio = compressRatio - 10;
+            if(compressRatio<1){
+                return new byte[0];
+            }
+            baos = new ByteArrayOutputStream();
+            bi.compress(Bitmap.CompressFormat.JPEG, compressRatio, baos);
+            data = baos.toByteArray();
+        }
+        return data;
+    }
+
+
+    private void sendImage(final byte[] imageBytes) {
+        final GoogleApiClient client = getGoogleApiClient(this);
+        if (nodeId != null) {
+            Log.d(TAG, "sending");
+            Log.d(TAG, "bytes" + String.valueOf(imageBytes.length));
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    Wearable.MessageApi.sendMessage(client, nodeId, "IMAGE", imageBytes);
+                    client.disconnect();
+                }
+            }).start();
+        }else{
+            Log.d(TAG, "not sending");
+
+        }
+
+    }
 
     private static float[] toFloatArray(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
