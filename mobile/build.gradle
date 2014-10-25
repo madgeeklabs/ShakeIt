@@ -21,7 +21,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    wearApp project(':wear')
     compile 'com.google.android.gms:play-services:+'
     compile 'com.github.nkzawa:socket.io-client:0.2.0'
     compile 'com.google.code.gson:gson:2.3'

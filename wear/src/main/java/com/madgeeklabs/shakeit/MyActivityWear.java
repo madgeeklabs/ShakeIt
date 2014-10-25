@@ -1,8 +1,10 @@
 package com.madgeeklabs.shakeit;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -16,12 +18,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.madgeeklabs.shakeit.models.User;
 
 import java.nio.ByteBuffer;
@@ -29,16 +35,16 @@ import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MyActivity extends Activity implements SensorEventListener {
+public class MyActivityWear extends Activity implements SensorEventListener {
 
-    private static final String TAG = MyActivity.class.getName();
+    private static final String TAG = MyActivityWear.class.getName();
     private TextView mTextView;
     private long timeStampSec;
     private SensorManager sensorManager;
     private Sensor mSensor;
     private float xLast;
     private long lastTimeStamp;
-    private static final float DIFF = (float) 8.5;
+    private static final float DIFF = (float) 4.5;
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
     private Integer amountToPay;
@@ -47,6 +53,7 @@ public class MyActivity extends Activity implements SensorEventListener {
     private int qReadings = 10*3;
     private float[] readings = new float[qReadings];
     private int count = 0;
+    private MyReceiver myReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +76,41 @@ public class MyActivity extends Activity implements SensorEventListener {
                     }
                 });
 
-                getGoogleApiClient(MyActivity.this);
+                getGoogleApiClient(MyActivityWear.this);
                 retrieveDeviceNode();
             }
         });
 
         Log.d(TAG, "called connect");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myReceiver = new MyReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ListenerServiceWear.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
+
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
+                SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private class MyReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            double datapassed = arg1.getDoubleExtra("AMOUNT", 0);
+            Log.d(TAG, "captured through broadcast, money: " + datapassed);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+        unregisterReceiver(myReceiver);
     }
 
     private GoogleApiClient getGoogleApiClient(Context context) {
@@ -90,7 +126,7 @@ public class MyActivity extends Activity implements SensorEventListener {
                 @Override
                 public void run() {
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    User me = new User("elchudi", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
+                    User me = new User("goofyahead", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
                     Gson myGson = new Gson();
                     String message = myGson.toJson(me, User.class);
                     Wearable.MessageApi.sendMessage(client, nodeId, message, null);
@@ -116,20 +152,6 @@ public class MyActivity extends Activity implements SensorEventListener {
                 Log.d(TAG, "I found a: " + nodeId);
             }
         }).start();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-                SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sensorManager.unregisterListener(this);
     }
 
     private void getAccelerometer(SensorEvent event) {

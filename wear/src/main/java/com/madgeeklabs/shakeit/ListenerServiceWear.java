@@ -1,29 +1,23 @@
 package com.madgeeklabs.shakeit;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.Asset;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by goofyahead on 10/24/14.
  */
-public class ListenerService extends WearableListenerService {
+public class ListenerServiceWear extends WearableListenerService {
 
-    private static final String TAG = ListenerService.class.getName();
+    private static final String TAG = ListenerServiceWear.class.getName();
+    public static final String MY_ACTION = "SHAKED";
     String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
 
@@ -35,7 +29,10 @@ public class ListenerService extends WearableListenerService {
     }
 
     private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        intent.setAction(MY_ACTION);
+        intent.putExtra("DATAPASSED", "something");
+        sendBroadcast(intent);
     }
 
     private void reply(String message) {
