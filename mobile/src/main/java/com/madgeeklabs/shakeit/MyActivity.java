@@ -159,4 +159,34 @@ public class MyActivity extends Activity implements SensorEventListener{
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
+
+   private void sendImage(final byte[] imageBytes) {
+       final GoogleApiClient client = getGoogleApiClient(this);
+       new Thread(new Runnable() {
+           @Override
+           public void run() {
+               client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+               NodeApi.GetConnectedNodesResult result =
+                       Wearable.NodeApi.getConnectedNodes(client).await();
+               List<Node> nodes = result.getNodes();
+               if (nodes.size() > 0) {
+                   nodeId = nodes.get(0).getId();
+               }
+               client.disconnect();
+               Log.d(TAG, "I found a: " + nodeId);
+           }
+       }).start();
+       if (nodeId != null) {
+           new Thread(new Runnable() {
+               @Override
+               public void run() {
+                   client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                   Wearable.MessageApi.sendMessage(client, nodeId, "IMAGE", imageBytes);
+                   client.disconnect();
+               }
+           }).start();
+       }
+   }
+
 }
