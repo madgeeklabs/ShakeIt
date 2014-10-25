@@ -1,16 +1,16 @@
 package com.madgeeklabs.shakeit.models;
 
 /**
- * Created by goofyahead on 10/24/14.
+ * Created by goofyahead on 10/25/14.
  */
-public class User {
+public class UserData {
     private String username;
     private String operation;
     private double ammount;
     private String timeStamp;
     private String image;
 
-    public User(String username, String operation, double ammount, String timeStamp) {
+    public UserData(String username, String operation, double ammount, String timeStamp) {
         this.username = username;
         this.operation = operation;
         this.ammount = ammount;

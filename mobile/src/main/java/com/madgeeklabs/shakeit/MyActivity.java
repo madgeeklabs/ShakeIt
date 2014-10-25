@@ -67,6 +67,7 @@ public class MyActivity extends Activity implements SensorEventListener{
     private EditText mUsername;
     private String urlData = "http://nowfie.com:7000";
     private String urlImages = "http://nowfie.com";
+    private ShakeitSharedPrefs prefs;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -147,30 +148,12 @@ public class MyActivity extends Activity implements SensorEventListener{
     }
 
 
-    String mCurrentPhotoPath;
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
+        prefs = new ShakeitSharedPrefs(this);
         Log.d(TAG, "STARTING AND MESSAGING TO THE WEAR");
         getGoogleApiClient(this);
         retrieveDeviceNode();
@@ -181,6 +164,7 @@ public class MyActivity extends Activity implements SensorEventListener{
         takeSelfie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                prefs.setRegistrationPushId(mUsername.getText().toString());
                 dispatchTakePictureIntent();
             }
         });
@@ -196,11 +180,6 @@ public class MyActivity extends Activity implements SensorEventListener{
                 .build();
     }
 
-    private static Asset createAssetFromBitmap(Bitmap bitmap) {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
-        return Asset.createFromBytes(byteStream.toByteArray());
-    }
 
     private void retrieveDeviceNode() {
         final GoogleApiClient client = getGoogleApiClient(this);
@@ -225,6 +204,7 @@ public class MyActivity extends Activity implements SensorEventListener{
                     .build();
 
             Api service = restAdapter.create(Api.class);
+
             service.getImage("/shakeit/23116-urxv69.jpg", new Callback<Response>() {
                 @Override
                 public void success(Response response, Response response2) {
@@ -299,7 +279,6 @@ public class MyActivity extends Activity implements SensorEventListener{
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
-
 
    private void sendImage(final byte[] imageBytes) {
        final GoogleApiClient client = getGoogleApiClient(this);

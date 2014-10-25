@@ -18,6 +18,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.google.gson.Gson;
 import com.madgeeklabs.shakeit.api.Api;
+import com.madgeeklabs.shakeit.models.UserData;
 
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -38,10 +39,13 @@ public class ListenerService extends WearableListenerService {
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
     private Socket socket;
     private String urlData = "http://nowfie.com:7000";
+    private ShakeitSharedPrefs prefs;
 
     public ListenerService() {
         super();
         Log.d(TAG, "Service started -------------------------------");
+
+        prefs = new ShakeitSharedPrefs(ShakeApplication.getAppContext());
 
         try {
             socket = IO.socket(urlData);
@@ -67,6 +71,8 @@ public class ListenerService extends WearableListenerService {
             @Override
             public void call(Object... args) {
                 Log.d(TAG, "received SHAKEEEEEE -_____--____--___--__--_-_-_");
+                Gson gson = new Gson();
+                UserData data = gson.fromJson(args[0].toString(), UserData.class);
                 sendToast(args[0].toString());
             }
         });
@@ -138,7 +144,10 @@ public class ListenerService extends WearableListenerService {
 
         }else{
             showToast(messageEvent.getPath());
-            socket.emit("message", messageEvent.getPath());
+            Gson gson = new Gson();
+            UserData data = gson.fromJson(messageEvent.getPath(), UserData.class);
+            data.setUsername(prefs.getRegistrationPushId());
+            socket.emit("message", gson.toJson(data));
         }
     }
 
