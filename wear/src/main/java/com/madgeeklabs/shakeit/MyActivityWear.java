@@ -45,6 +45,8 @@ public class MyActivityWear extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor mSensor;
     private float xLast;
+    private float yLast;
+    private float zLast;
     private long lastTimeStamp;
     private static final float DIFF = (float) 4.5;
     private String nodeId;
@@ -232,12 +234,23 @@ public class MyActivityWear extends Activity implements SensorEventListener {
         timeStampSec = System.currentTimeMillis();
         if (x - xLast > DIFF && (timeStampSec - lastTimeStamp) > 800) {
             Log.d(TAG, "" + (x - xLast));
-            Toast.makeText(this, "" + (x - xLast), Toast.LENGTH_SHORT).show();
+            sendToast();
+            lastTimeStamp = timeStampSec;
+        }
+        if (y - yLast > DIFF && (timeStampSec - lastTimeStamp) > 800) {
+            Log.d(TAG, "" + (y - yLast));
+            sendToast();
+            lastTimeStamp = timeStampSec;
+        }
+        if (z - zLast > DIFF && (timeStampSec - lastTimeStamp) > 800) {
+            Log.d(TAG, "" + (z - zLast));
             sendToast();
             lastTimeStamp = timeStampSec;
         }
 
         xLast = x;
+        yLast = y;
+        zLast = z;
 //        yLast = y;
 //        zLast = z;
     }
