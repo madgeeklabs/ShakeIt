@@ -2,8 +2,10 @@ package com.madgeeklabs.shakeit;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -29,6 +32,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -42,6 +46,26 @@ public class MyActivity extends Activity implements SensorEventListener{
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
 
+
+
+
+    private byte[] compress(Bitmap bi, int maxKiloBytes){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int compressRatio = 90;
+        bi.compress(Bitmap.CompressFormat.JPEG, compressRatio, baos);
+        byte[] data = baos.toByteArray();
+        while(data.length/1024>maxKiloBytes){
+            compressRatio = compressRatio - 10;
+            if(compressRatio<1){
+                return new byte[0];
+            }
+            baos = new ByteArrayOutputStream();
+            bi.compress(Bitmap.CompressFormat.JPEG, compressRatio, baos);
+            data = baos.toByteArray();
+        }
+        return data;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +74,13 @@ public class MyActivity extends Activity implements SensorEventListener{
         Log.d(TAG, "STARTING AND MESSAGING TO THE WEAR");
         getGoogleApiClient(this);
         retrieveDeviceNode();
+
+
+        // Read a Bitmap from Assets
+            Drawable drawable = getResources().getDrawable(R.drawable.s);
+            Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.s);
+            byte[] toSend = compress(bitmap, 5);
+            // Assign the bitmap to an ImageView in this layout
 
     }
 
