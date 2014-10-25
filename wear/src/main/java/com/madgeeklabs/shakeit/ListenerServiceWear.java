@@ -51,6 +51,7 @@ public class ListenerServiceWear extends WearableListenerService {
         intent.setAction(MY_ACTION);
         intent.putExtra("AMOUNT", one.getAmmount());
         intent.putExtra("NAME", one.getUsername());
+        intent.putExtra("TYPE", one.getOperation());
         sendBroadcast(intent);
     }
 

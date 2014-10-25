@@ -49,7 +49,7 @@ public class MyActivityWear extends Activity implements SensorEventListener {
     private static final float DIFF = (float) 4.5;
     private String nodeId;
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
-    private Integer amountToPay;
+    private Integer amountToPay = 0;
 
 
     private int qReadings = 10*3;
@@ -121,13 +121,19 @@ public class MyActivityWear extends Activity implements SensorEventListener {
                 byte[] data = arg1.getByteArrayExtra("DATA");
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 mView.setImageBitmap(bitmap);
-
-
             }else if(arg1.getAction().equalsIgnoreCase(ListenerServiceWear.MY_ACTION)){
                 double amount = arg1.getDoubleExtra("AMOUNT", 0);
                 String name = arg1.getStringExtra("NAME");
                 Log.d(TAG, "captured through broadcast, money: " + amount + " from: " + name);
-                transactionAmount.setText("" + amount + "€");
+                if (arg1.getStringExtra("TYPE").equalsIgnoreCase("receiving")) {
+                    transactionAmount.setText("+" + amount + "€");
+                    transactionAmount.setTextColor(getResources().getColor(R.color.green));
+                } else {
+                    transactionAmount.setText("-" + amount + "€");
+                    transactionAmount.setTextColor(getResources().getColor(R.color.error_red));
+                }
+
+                paymentButton.setVisibility(View.GONE);
                 userName.setText(name);
                 confirmedTransaction.setVisibility(View.VISIBLE);
                 resultHolder.setVisibility(View.VISIBLE);
@@ -156,7 +162,12 @@ public class MyActivityWear extends Activity implements SensorEventListener {
                 @Override
                 public void run() {
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    User me = new User("goofyahead", "payment", 16.50, String.valueOf(System.currentTimeMillis()));
+                    User me = null;
+                    if (amountToPay == 0) {
+                        me = new User("goofyahead", "receiving", amountToPay, String.valueOf(System.currentTimeMillis()));
+                    } else {
+                        me = new User("goofyahead", "payment", amountToPay, String.valueOf(System.currentTimeMillis()));
+                    }
                     Gson myGson = new Gson();
                     String message = myGson.toJson(me, User.class);
                     Wearable.MessageApi.sendMessage(client, nodeId, message, null);

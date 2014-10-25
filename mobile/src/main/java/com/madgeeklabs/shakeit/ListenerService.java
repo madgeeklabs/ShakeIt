@@ -138,7 +138,7 @@ public class ListenerService extends WearableListenerService {
 
         }else{
             showToast(messageEvent.getPath());
-        socket.emit("message", messageEvent.getPath());
+            socket.emit("message", messageEvent.getPath());
         }
     }
 
