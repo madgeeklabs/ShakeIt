@@ -87,20 +87,6 @@ public class MyActivity extends Activity implements SensorEventListener{
                 .build();
     }
 
-    private void sendToast() {
-        final GoogleApiClient client = getGoogleApiClient(this);
-        if (nodeId != null) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    Wearable.MessageApi.sendMessage(client, nodeId, "HOLA", null);
-                    client.disconnect();
-                }
-            }).start();
-        }
-    }
-
     private static Asset createAssetFromBitmap(Bitmap bitmap) {
         final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);

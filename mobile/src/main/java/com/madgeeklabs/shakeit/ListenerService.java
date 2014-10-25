@@ -67,7 +67,6 @@ public class ListenerService extends WearableListenerService {
             @Override
             public void call(Object... args) {
                 Log.d(TAG, "received SHAKEEEEEE -_____--____--___--__--_-_-_");
-                Gson gson = new Gson();
                 sendToast(args[0].toString());
             }
         });
@@ -88,6 +87,7 @@ public class ListenerService extends WearableListenerService {
     }
 
     private void sendToast(final String message) {
+        Log.d(TAG, "sending message ->" + message);
         final GoogleApiClient client = getGoogleApiClient(this);
         if (nodeId != null) {
             new Thread(new Runnable() {
