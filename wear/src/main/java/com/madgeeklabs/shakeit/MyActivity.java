@@ -138,13 +138,14 @@ public class MyActivity extends Activity implements SensorEventListener {
         float x = values[0];
         float y = values[1];
         float z = values[2];
-
-        readings[count] = x;
-        count++;
-        readings[count] = y;
-        count++;
-        readings[count] = z;
-        count++;
+        if(false) {
+            readings[count] = x;
+            count++;
+            readings[count] = y;
+            count++;
+            readings[count] = z;
+            count++;
+        }
         if(false && count % qReadings == 0){
 
             //service.readings(readings);
