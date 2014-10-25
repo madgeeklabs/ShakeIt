@@ -1,5 +1,9 @@
 package com.madgeeklabs.shakeit.api;
 
+import android.content.res.TypedArray;
+
+import java.util.List;
+
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Header;
@@ -12,7 +16,7 @@ public interface Api {
 
 
     @POST("/api/readings")
-    String readings(@Body float[] readings);
+    String readings(@Body List readings);
 
 
     @GET("/api/hello")

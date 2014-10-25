@@ -22,6 +22,8 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
@@ -83,7 +85,14 @@ public class ListenerService extends WearableListenerService {
         if(messageEvent.getPath().equals("READINGS")){
             byte[] data = messageEvent.getData();
             float[] readings = toFloatArray(data);
-            Log.d("readings", String.valueOf(readings));
+            StringBuffer buff = new StringBuffer(readings.length);
+            List l = new ArrayList();
+            for(float f: readings){
+                l.add(Float.valueOf(f));
+                buff.append(f) ;
+                buff.append(":") ;
+            }
+            Log.d("readings", buff.toString());
 
 
             try{
@@ -92,13 +101,12 @@ public class ListenerService extends WearableListenerService {
                         .build();
 
                 Api service = restAdapter.create(Api.class);
-                service.readings(readings);
+                service.readings(l);
 
             }catch (Exception e){
 
             }
 
-            showToast(messageEvent.getPath());
         }else{
             showToast(messageEvent.getPath());
         socket.emit("message", messageEvent.getPath());
