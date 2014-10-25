@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -33,9 +34,12 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.madgeeklabs.shakeit.api.Api;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -43,6 +47,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.mime.TypedFile;
 
 
 public class MyActivity extends Activity implements SensorEventListener{
@@ -52,6 +62,8 @@ public class MyActivity extends Activity implements SensorEventListener{
     private long CONNECTION_TIME_OUT_MS = 2 * 1000;
     private Button takeSelfie;
     private ImageView mImageView;
+    private EditText mUsername;
+    private String urlData = "http://nowfie.com:7000";
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -67,6 +79,49 @@ public class MyActivity extends Activity implements SensorEventListener{
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             mImageView.setImageBitmap(imageBitmap);
+
+
+            RestAdapter restAdapter = new RestAdapter.Builder()
+                    .setEndpoint(urlData)
+                    .build();
+
+            Api service = restAdapter.create(Api.class);
+
+
+            File f = Utils.getOutputMediaFile(Utils.MEDIA_TYPE_IMAGE);
+
+            //Convert bitmap to byte array
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(f);
+                fos.write(bitmapdata);
+                fos.close();
+                TypedFile file = new TypedFile("application/octet-stream", f);
+                service.uploadSelfie(mUsername.getText().toString(), file, new Callback<Response>() {
+                    @Override
+                    public void success(Response response, Response response2) {
+                       Log.d(TAG,"success") ;
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Log.d(TAG,"failure") ;
+                        Log.d(TAG,error.getMessage()) ;
+
+                    }
+                });
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
     }
 
@@ -119,6 +174,7 @@ public class MyActivity extends Activity implements SensorEventListener{
 
         takeSelfie = (Button) findViewById(R.id.take_picture);
         mImageView = (ImageView) findViewById(R.id.imageView1);
+        mUsername = (EditText) findViewById(R.id.username);
         takeSelfie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
