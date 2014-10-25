@@ -12,6 +12,8 @@ import retrofit.http.Header;
 import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.Part;
+import retrofit.http.Path;
+import retrofit.http.Streaming;
 import retrofit.mime.TypedFile;
 
 /**
@@ -32,6 +34,11 @@ public interface Api {
     @GET("/api/hello")
     String hello(@Header("pushId") String pushId);
 
+
+
+     @GET("/{filename}")
+    @Streaming
+    void getImage( @Path("filename") String filename, Callback<Response> callback );
 }
 
 

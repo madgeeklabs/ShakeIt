@@ -36,6 +36,8 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.madgeeklabs.shakeit.api.Api;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,6 +66,7 @@ public class MyActivity extends Activity implements SensorEventListener{
     private ImageView mImageView;
     private EditText mUsername;
     private String urlData = "http://nowfie.com:7000";
+    private String urlImages = "http://nowfie.com";
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -216,8 +219,54 @@ public class MyActivity extends Activity implements SensorEventListener{
 
                 Log.d(TAG, "I found a: " + nodeId);
                 Bitmap bitmap = BitmapFactory.decodeResource(MyActivity.this.getResources(), R.drawable.s);
-                byte[] toSend = compress(bitmap, 50);
-                sendImage(toSend);
+
+                            RestAdapter restAdapter = new RestAdapter.Builder()
+                    .setEndpoint(urlImages)
+                    .build();
+
+            Api service = restAdapter.create(Api.class);
+            service.getImage("/shakeit/23116-urxv69.jpg", new Callback<Response>() {
+                @Override
+                public void success(Response response, Response response2) {
+                    Log.d(TAG,"success");
+                    final Response r = response;
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground( final Void ... params ) {
+                            try {
+                                InputStream is = null;
+
+                                is = r.getBody().in();
+                                byte[] bytes = IOUtils.toByteArray(is);
+
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                byte[] toSend = compress(bitmap, 50);
+                                sendImage(toSend);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute( final Void result ) {
+                            // continue what you are doing...
+
+                        }
+                    }.execute();
+
+
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Log.d(TAG,"failure");
+                    Log.d(TAG,error.getMessage());
+
+                }
+            });
+
             }
         }).start();
     }
